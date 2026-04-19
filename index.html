@@ -1,0 +1,1303 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2030 100万美股目标 Tracker</title>
+  <style>
+    :root {
+      --bg: #f6f3ea;
+      --card: #fffdf8;
+      --text: #1f2a37;
+      --muted: #6b7280;
+      --accent: #0f766e;
+      --danger: #b91c1c;
+      --border: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, #d1fae5 0, transparent 35%),
+        radial-gradient(circle at 90% 85%, #fde68a 0, transparent 28%),
+        var(--bg);
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 20px rgba(15, 118, 110, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin: 0; }
+    .sub { color: var(--muted); margin: 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .account-box {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      margin-top: 2px;
+    }
+    .account-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .field-gap { margin-top: 10px; }
+    label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px; }
+    input, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { filter: brightness(1.05); }
+    .metrics {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: 14px;
+    }
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+    .metric .k { color: var(--muted); font-size: 12px; }
+    .metric .v { font-size: 22px; margin-top: 4px; font-weight: 700; }
+    .progress {
+      margin-top: 12px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      height: 22px;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #14b8a6);
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+    .bar-text {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+    th { background: #f8fafc; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    .gain { color: #047857; font-weight: 600; }
+    .loss { color: var(--danger); font-weight: 600; }
+    .row-actions { display: flex; gap: 8px; }
+    .mini {
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    .warn {
+      margin-top: 10px;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+    }
+    .mono { font-variant-numeric: tabular-nums; }
+    .curve-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+    .curve-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .curve-meta {
+      margin: 6px 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .curve-svg {
+      width: 100%;
+      height: 150px;
+      display: block;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+      border: 1px solid #eef2f7;
+    }
+    .market-canvas {
+      width: 100%;
+      height: 260px;
+      border-radius: 10px;
+      border: 1px solid #eef2f7;
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+      margin-top: 10px;
+    }
+    .meta-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>2030 100万美股目标 Tracker（四账户）</h1>
+      <p class="sub">四个账户并行追踪，实时看各账户和总目标进度。</p>
+      <div class="grid">
+        <div>
+          <label for="target">最终目标总资产 (CAD)</label>
+          <input id="target" type="number" min="0" step="1000" value="1000000" />
+        </div>
+        <div>
+          <label for="startDate">起算日期（用于年化收益率）</label>
+          <input id="startDate" type="date" />
+        </div>
+        <div>
+          <label for="targetDate">最终目标日期</label>
+          <input id="targetDate" type="date" value="2030-12-31" />
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <div class="account-box">
+          <p class="account-title">账户 A</p>
+          <label for="accName1">账户1名称</label>
+          <input id="accName1" type="text" placeholder="例如 长线账户" />
+          <label for="accStart1" class="field-gap">账户1起始资产 (CAD)</label>
+          <input id="accStart1" type="number" min="0" step="100" value="0" />
+        </div>
+        <div class="account-box">
+          <p class="account-title">账户 B</p>
+          <label for="accName2">账户2名称</label>
+          <input id="accName2" type="text" placeholder="例如 ETF账户" />
+          <label for="accStart2" class="field-gap">账户2起始资产 (CAD)</label>
+          <input id="accStart2" type="number" min="0" step="100" value="0" />
+        </div>
+        <div class="account-box">
+          <p class="account-title">账户 C</p>
+          <label for="accName3">账户3名称</label>
+          <input id="accName3" type="text" placeholder="例如 交易账户" />
+          <label for="accStart3" class="field-gap">账户3起始资产 (CAD)</label>
+          <input id="accStart3" type="number" min="0" step="100" value="0" />
+        </div>
+        <div class="account-box">
+          <p class="account-title">账户 D</p>
+          <label for="accName4">账户4名称</label>
+          <input id="accName4" type="text" placeholder="例如 退休账户" />
+          <label for="accStart4" class="field-gap">账户4起始资产 (CAD)</label>
+          <input id="accStart4" type="number" min="0" step="100" value="0" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>每月盈利录入（四账户同屏）</h2>
+      <div class="grid">
+        <div>
+          <label for="month">月份</label>
+          <input id="month" type="month" />
+        </div>
+        <div>
+          <label id="profitLabel1" for="profit1">账户1 本月盈利 (CAD)</label>
+          <input id="profit1" type="number" step="0.01" placeholder="例如 3200" />
+        </div>
+        <div>
+          <label id="profitLabel2" for="profit2">账户2 本月盈利 (CAD)</label>
+          <input id="profit2" type="number" step="0.01" placeholder="例如 800" />
+        </div>
+        <div>
+          <label id="profitLabel3" for="profit3">账户3 本月盈利 (CAD)</label>
+          <input id="profit3" type="number" step="0.01" placeholder="例如 -500" />
+        </div>
+        <div>
+          <label id="profitLabel4" for="profit4">账户4 本月盈利 (CAD)</label>
+          <input id="profit4" type="number" step="0.01" placeholder="例如 1200" />
+        </div>
+        <div style="align-self:end">
+          <button id="addBtn">添加/更新本月记录</button>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><div class="k">总当前资产（四账户合计）</div><div class="v mono" id="currentAsset">$0</div></div>
+        <div class="metric"><div class="k">距离最终目标还差</div><div class="v mono" id="remaining">$0</div></div>
+        <div class="metric"><div class="k">累计盈利（四账户合计）</div><div class="v mono" id="totalProfit">$0</div></div>
+        <div class="metric"><div class="k">月均需盈利(到最终目标)</div><div class="v mono" id="needPerMonth">$0</div></div>
+        <div class="metric"><div class="k">当前已实现年化收益率</div><div class="v mono" id="actualCagr">0.00%</div></div>
+        <div class="metric"><div class="k">达成最终目标所需年化收益率</div><div class="v mono" id="requiredCagrFinal">0.00%</div></div>
+      </div>
+
+      <div class="grid-4" id="accountMetrics"></div>
+
+      <div class="progress" aria-label="目标进度">
+        <div class="bar" id="progressBar"></div>
+      </div>
+      <div class="bar-text" id="progressText">进度 0%</div>
+      <div class="warn" id="warningBox" style="display:none"></div>
+    </section>
+
+    <section class="card">
+      <h2>账户收益曲线</h2>
+      <p class="sub" style="margin-top:6px">按月累计净资产变化（起始资产 + 每月盈利）。</p>
+      <div class="grid-4">
+        <div class="curve-card">
+          <p class="curve-title" id="curveTitle1">账户1 收益曲线</p>
+          <p class="curve-meta mono" id="curveMeta1">--</p>
+          <svg id="curve1" class="curve-svg" viewBox="0 0 320 150" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="curve-card">
+          <p class="curve-title" id="curveTitle2">账户2 收益曲线</p>
+          <p class="curve-meta mono" id="curveMeta2">--</p>
+          <svg id="curve2" class="curve-svg" viewBox="0 0 320 150" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="curve-card">
+          <p class="curve-title" id="curveTitle3">账户3 收益曲线</p>
+          <p class="curve-meta mono" id="curveMeta3">--</p>
+          <svg id="curve3" class="curve-svg" viewBox="0 0 320 150" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="curve-card">
+          <p class="curve-title" id="curveTitle4">账户4 收益曲线</p>
+          <p class="curve-meta mono" id="curveMeta4">--</p>
+          <svg id="curve4" class="curve-svg" viewBox="0 0 320 150" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Mega7 走势图与高低位判断</h2>
+      <p class="sub" style="margin-top:6px">数据源：Yahoo Finance。判定逻辑基于 52 周区间位置。</p>
+      <div class="meta-row">
+        <button id="refreshMarketBtn" style="width:auto;padding:8px 14px;">刷新 Mega7 行情</button>
+        <p class="small-note mono" id="marketUpdatedAt">未刷新</p>
+      </div>
+      <canvas id="mega7Chart" class="market-canvas" width="960" height="260"></canvas>
+      <p class="small-note" id="mega7Summary">等待加载数据…</p>
+      <table>
+        <thead>
+          <tr>
+            <th>代码</th>
+            <th>现价</th>
+            <th>52周低</th>
+            <th>52周高</th>
+            <th>区间位置</th>
+            <th>判断</th>
+          </tr>
+        </thead>
+        <tbody id="mega7Rows"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Mega Cap 低估候选</h2>
+      <p class="sub" style="margin-top:6px">按大市值（>= 200B CAD 等值口径近似）中相对估值打分，不构成投资建议。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>代码</th>
+            <th>名称</th>
+            <th>市值</th>
+            <th>PE(TTM)</th>
+            <th>PB</th>
+            <th>股息率</th>
+            <th>估值分数</th>
+          </tr>
+        </thead>
+        <tbody id="undervaluedRows"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>年度目标（总资产）</h2>
+      <p class="sub" style="margin-top:6px">例如：2026 年末 30 万，2027 年末 45 万。你可随时新增或覆盖。</p>
+      <div class="grid">
+        <div>
+          <label for="goalYear">目标年份</label>
+          <input id="goalYear" type="number" min="2020" max="2100" step="1" placeholder="例如 2027" />
+        </div>
+        <div>
+          <label for="goalAmount">该年年末目标资产 (CAD)</label>
+          <input id="goalAmount" type="number" min="0" step="1000" placeholder="例如 450000" />
+        </div>
+        <div style="align-self:end">
+          <button id="addGoalBtn">添加/更新年度目标</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>年份</th>
+            <th>目标资产</th>
+            <th>还差多少</th>
+            <th>完成百分比</th>
+            <th>达成该年所需年化</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="goalRows"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>月度记录（四账户）</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>月份</th>
+            <th id="headAcc1">账户1</th>
+            <th id="headAcc2">账户2</th>
+            <th id="headAcc3">账户3</th>
+            <th id="headAcc4">账户4</th>
+            <th>当月合计</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "stock_goal_tracker_v4";
+
+    const els = {
+      target: document.getElementById("target"),
+      startDate: document.getElementById("startDate"),
+      targetDate: document.getElementById("targetDate"),
+      accName1: document.getElementById("accName1"),
+      accName2: document.getElementById("accName2"),
+      accName3: document.getElementById("accName3"),
+      accName4: document.getElementById("accName4"),
+      accStart1: document.getElementById("accStart1"),
+      accStart2: document.getElementById("accStart2"),
+      accStart3: document.getElementById("accStart3"),
+      accStart4: document.getElementById("accStart4"),
+      month: document.getElementById("month"),
+      profit1: document.getElementById("profit1"),
+      profit2: document.getElementById("profit2"),
+      profit3: document.getElementById("profit3"),
+      profit4: document.getElementById("profit4"),
+      profitLabel1: document.getElementById("profitLabel1"),
+      profitLabel2: document.getElementById("profitLabel2"),
+      profitLabel3: document.getElementById("profitLabel3"),
+      profitLabel4: document.getElementById("profitLabel4"),
+      addBtn: document.getElementById("addBtn"),
+      currentAsset: document.getElementById("currentAsset"),
+      remaining: document.getElementById("remaining"),
+      totalProfit: document.getElementById("totalProfit"),
+      needPerMonth: document.getElementById("needPerMonth"),
+      actualCagr: document.getElementById("actualCagr"),
+      requiredCagrFinal: document.getElementById("requiredCagrFinal"),
+      accountMetrics: document.getElementById("accountMetrics"),
+      progressBar: document.getElementById("progressBar"),
+      progressText: document.getElementById("progressText"),
+      rows: document.getElementById("rows"),
+      warningBox: document.getElementById("warningBox"),
+      goalYear: document.getElementById("goalYear"),
+      goalAmount: document.getElementById("goalAmount"),
+      addGoalBtn: document.getElementById("addGoalBtn"),
+      goalRows: document.getElementById("goalRows"),
+      headAcc1: document.getElementById("headAcc1"),
+      headAcc2: document.getElementById("headAcc2"),
+      headAcc3: document.getElementById("headAcc3"),
+      headAcc4: document.getElementById("headAcc4"),
+      curveTitle1: document.getElementById("curveTitle1"),
+      curveTitle2: document.getElementById("curveTitle2"),
+      curveTitle3: document.getElementById("curveTitle3"),
+      curveTitle4: document.getElementById("curveTitle4"),
+      curveMeta1: document.getElementById("curveMeta1"),
+      curveMeta2: document.getElementById("curveMeta2"),
+      curveMeta3: document.getElementById("curveMeta3"),
+      curveMeta4: document.getElementById("curveMeta4"),
+      curve1: document.getElementById("curve1"),
+      curve2: document.getElementById("curve2"),
+      curve3: document.getElementById("curve3"),
+      curve4: document.getElementById("curve4"),
+      refreshMarketBtn: document.getElementById("refreshMarketBtn"),
+      marketUpdatedAt: document.getElementById("marketUpdatedAt"),
+      mega7Chart: document.getElementById("mega7Chart"),
+      mega7Summary: document.getElementById("mega7Summary"),
+      mega7Rows: document.getElementById("mega7Rows"),
+      undervaluedRows: document.getElementById("undervaluedRows")
+    };
+
+    const MEGA7 = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA"];
+    const MEGA_CAP_UNIVERSE = [
+      "AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA", "BRK-B", "LLY", "AVGO",
+      "JPM", "V", "UNH", "XOM", "WMT", "MA", "JNJ", "PG", "ORCL", "COST", "HD"
+    ];
+
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const todayISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    els.month.value = currentMonth;
+    els.goalYear.value = String(now.getFullYear());
+
+    let state = loadState();
+
+    function defaultAccounts() {
+      return [
+        { name: "账户1", startCapital: 0 },
+        { name: "账户2", startCapital: 0 },
+        { name: "账户3", startCapital: 0 },
+        { name: "账户4", startCapital: 0 }
+      ];
+    }
+
+    function defaultGoals() {
+      return {
+        2026: 300000,
+        2027: 450000,
+        2028: 620000,
+        2029: 800000,
+        2030: 1000000
+      };
+    }
+
+    function migrateFromV2() {
+      try {
+        const raw = localStorage.getItem("stock_goal_tracker_v2");
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        const migratedRecords = Array.isArray(data.records)
+          ? data.records.map((r) => ({ month: r.month, p1: Number(r.profit || 0), p2: 0, p3: 0, p4: 0 }))
+          : [];
+
+        return {
+          target: Number(data.target) || 1000000,
+          startDate: data.startDate || todayISO,
+          targetDate: data.targetDate || "2030-12-31",
+          accounts: [
+            { name: "账户1", startCapital: Number(data.startCapital || 0) },
+            { name: "账户2", startCapital: 0 },
+            { name: "账户3", startCapital: 0 },
+            { name: "账户4", startCapital: 0 }
+          ],
+          records: migratedRecords,
+          goals: data.goals && typeof data.goals === "object" ? data.goals : defaultGoals()
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function migrateFromV3() {
+      try {
+        const raw = localStorage.getItem("stock_goal_tracker_v3");
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        const accounts3 = Array.isArray(data.accounts) ? data.accounts : [];
+        const records3 = Array.isArray(data.records) ? data.records : [];
+
+        return {
+          target: Number(data.target) || 1000000,
+          startDate: data.startDate || todayISO,
+          targetDate: data.targetDate || "2030-12-31",
+          accounts: [
+            { name: String(accounts3[0]?.name || "账户1"), startCapital: Number(accounts3[0]?.startCapital || 0) },
+            { name: String(accounts3[1]?.name || "账户2"), startCapital: Number(accounts3[1]?.startCapital || 0) },
+            { name: String(accounts3[2]?.name || "账户3"), startCapital: Number(accounts3[2]?.startCapital || 0) },
+            { name: "账户4", startCapital: 0 }
+          ],
+          records: records3.map((r) => ({
+            month: String(r.month || ""),
+            p1: Number(r.p1 || 0),
+            p2: Number(r.p2 || 0),
+            p3: Number(r.p3 || 0),
+            p4: 0
+          })),
+          goals: data.goals && typeof data.goals === "object" ? data.goals : defaultGoals()
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          const migratedV3 = migrateFromV3();
+          if (migratedV3) return migratedV3;
+          const migrated = migrateFromV2();
+          if (migrated) return migrated;
+          return {
+            target: 1000000,
+            startDate: todayISO,
+            targetDate: "2030-12-31",
+            accounts: defaultAccounts(),
+            records: [],
+            goals: defaultGoals()
+          };
+        }
+        const data = JSON.parse(raw);
+        const accounts = Array.isArray(data.accounts) && data.accounts.length === 4
+          ? data.accounts.map((a, idx) => ({
+            name: String(a.name || `账户${idx + 1}`),
+            startCapital: Number(a.startCapital || 0)
+          }))
+          : defaultAccounts();
+
+        const records = Array.isArray(data.records)
+          ? data.records.map((r) => ({
+            month: String(r.month || ""),
+            p1: Number(r.p1 || 0),
+            p2: Number(r.p2 || 0),
+            p3: Number(r.p3 || 0),
+            p4: Number(r.p4 || 0)
+          }))
+          : [];
+
+        return {
+          target: Number(data.target) || 1000000,
+          startDate: data.startDate || todayISO,
+          targetDate: data.targetDate || "2030-12-31",
+          accounts,
+          records,
+          goals: data.goals && typeof data.goals === "object" ? data.goals : defaultGoals()
+        };
+      } catch (e) {
+        return {
+          target: 1000000,
+          startDate: todayISO,
+          targetDate: "2030-12-31",
+          accounts: defaultAccounts(),
+          records: [],
+          goals: defaultGoals()
+        };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function fmtUSD(value) {
+      return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(value || 0);
+    }
+
+    function fmtPct(value) {
+      if (!Number.isFinite(value)) return "--";
+      return `${value.toFixed(2)}%`;
+    }
+
+    function fmtCap(value) {
+      if (!Number.isFinite(value)) return "--";
+      if (value >= 1e12) return `${(value / 1e12).toFixed(2)}T`;
+      if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
+      return `${(value / 1e6).toFixed(1)}M`;
+    }
+
+    function toNum(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    async function fetchQuotes(symbols) {
+      const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(symbols.join(","))}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`quote api ${res.status}`);
+      const data = await res.json();
+      return Array.isArray(data?.quoteResponse?.result) ? data.quoteResponse.result : [];
+    }
+
+    async function fetchChart(symbol) {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1y&interval=1d`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`chart api ${res.status}`);
+      const data = await res.json();
+      const result = data?.chart?.result?.[0];
+      const ts = Array.isArray(result?.timestamp) ? result.timestamp : [];
+      const close = Array.isArray(result?.indicators?.quote?.[0]?.close) ? result.indicators.quote[0].close : [];
+      const out = [];
+      for (let i = 0; i < Math.min(ts.length, close.length); i++) {
+        const c = toNum(close[i]);
+        if (Number.isFinite(c)) out.push({ t: ts[i], c });
+      }
+      return out;
+    }
+
+    function verdictByPosition(pct) {
+      if (!Number.isFinite(pct)) return "数据不足";
+      if (pct <= 30) return "偏低位";
+      if (pct >= 70) return "偏高位";
+      return "中性区间";
+    }
+
+    function drawMega7Canvas(seriesMap) {
+      const canvas = els.mega7Chart;
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const keys = Object.keys(seriesMap).filter((k) => Array.isArray(seriesMap[k]) && seriesMap[k].length > 1);
+      if (!keys.length) {
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "14px Segoe UI";
+        ctx.fillText("暂无可绘制数据", 20, 40);
+        return;
+      }
+
+      let min = Infinity;
+      let max = -Infinity;
+      for (const k of keys) {
+        for (const p of seriesMap[k]) {
+          min = Math.min(min, p.v);
+          max = Math.max(max, p.v);
+        }
+      }
+      if (!Number.isFinite(min) || !Number.isFinite(max)) return;
+      if (min === max) {
+        min -= 1;
+        max += 1;
+      }
+
+      const colors = ["#0f766e", "#0284c7", "#b45309", "#7c3aed", "#dc2626", "#0ea5e9", "#16a34a"];
+      const padL = 38;
+      const padR = 18;
+      const padT = 16;
+      const padB = 24;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+
+      ctx.strokeStyle = "#e5e7eb";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const y = padT + (plotH * i) / 3;
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(w - padR, y);
+        ctx.stroke();
+      }
+
+      const xFor = (idx, len) => padL + (idx / Math.max(len - 1, 1)) * plotW;
+      const yFor = (v) => padT + ((max - v) / (max - min)) * plotH;
+
+      keys.forEach((k, ki) => {
+        const arr = seriesMap[k];
+        ctx.beginPath();
+        arr.forEach((p, i) => {
+          const x = xFor(i, arr.length);
+          const y = yFor(p.v);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = colors[ki % colors.length];
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const last = arr[arr.length - 1];
+        const lx = xFor(arr.length - 1, arr.length);
+        const ly = yFor(last.v);
+        ctx.fillStyle = colors[ki % colors.length];
+        ctx.beginPath();
+        ctx.arc(lx, ly, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function normalizeSeries(points) {
+      if (!points.length) return [];
+      const base = points[0].c;
+      if (!Number.isFinite(base) || base === 0) return [];
+      return points.map((p) => ({ t: p.t, v: (p.c / base) * 100 }));
+    }
+
+    function renderMega7Rows(quotes) {
+      els.mega7Rows.innerHTML = "";
+      let lowCount = 0;
+      let highCount = 0;
+
+      for (const q of quotes) {
+        const price = toNum(q.regularMarketPrice);
+        const low = toNum(q.fiftyTwoWeekLow);
+        const high = toNum(q.fiftyTwoWeekHigh);
+        const pos = Number.isFinite(price) && Number.isFinite(low) && Number.isFinite(high) && high > low
+          ? ((price - low) / (high - low)) * 100
+          : NaN;
+        const verdict = verdictByPosition(pos);
+        if (verdict === "偏低位") lowCount += 1;
+        if (verdict === "偏高位") highCount += 1;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${q.symbol || "--"}</td>
+          <td class="mono">${fmtUSD(price)}</td>
+          <td class="mono">${fmtUSD(low)}</td>
+          <td class="mono">${fmtUSD(high)}</td>
+          <td class="mono">${Number.isFinite(pos) ? fmtPct(pos) : "--"}</td>
+          <td>${verdict}</td>
+        `;
+        els.mega7Rows.appendChild(tr);
+      }
+
+      const total = quotes.length || 1;
+      els.mega7Summary.textContent = `偏低位 ${lowCount}/${total}，偏高位 ${highCount}/${total}。区间位置越低，通常代表相对 52 周区间更“便宜”。`;
+    }
+
+    function norm01(v, min, max, inverse = false) {
+      if (!Number.isFinite(v) || !Number.isFinite(min) || !Number.isFinite(max) || max === min) return 0.5;
+      let x = (v - min) / (max - min);
+      x = Math.max(0, Math.min(1, x));
+      return inverse ? 1 - x : x;
+    }
+
+    function renderUndervalued(quotes) {
+      const pool = quotes
+        .filter((q) => Number(q.marketCap || 0) >= 200e9)
+        .map((q) => ({
+          symbol: q.symbol,
+          name: q.shortName || q.longName || q.symbol,
+          marketCap: toNum(q.marketCap),
+          pe: toNum(q.trailingPE),
+          pb: toNum(q.priceToBook),
+          dy: toNum(q.trailingAnnualDividendYield) * 100
+        }))
+        .filter((x) => Number.isFinite(x.pe) && x.pe > 0 && Number.isFinite(x.pb) && x.pb > 0);
+
+      els.undervaluedRows.innerHTML = "";
+      if (!pool.length) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = '<td colspan="7" style="color:#6b7280">暂无可用估值数据。</td>';
+        els.undervaluedRows.appendChild(tr);
+        return;
+      }
+
+      const peMin = Math.min(...pool.map((x) => x.pe));
+      const peMax = Math.max(...pool.map((x) => x.pe));
+      const pbMin = Math.min(...pool.map((x) => x.pb));
+      const pbMax = Math.max(...pool.map((x) => x.pb));
+      const dyMin = Math.min(...pool.map((x) => (Number.isFinite(x.dy) ? x.dy : 0)));
+      const dyMax = Math.max(...pool.map((x) => (Number.isFinite(x.dy) ? x.dy : 0)));
+
+      const ranked = pool.map((x) => {
+        const peScore = norm01(x.pe, peMin, peMax, true);
+        const pbScore = norm01(x.pb, pbMin, pbMax, true);
+        const dyScore = norm01(Number.isFinite(x.dy) ? x.dy : 0, dyMin, dyMax, false);
+        const score = peScore * 0.5 + pbScore * 0.3 + dyScore * 0.2;
+        return { ...x, score };
+      }).sort((a, b) => b.score - a.score).slice(0, 8);
+
+      for (const x of ranked) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${x.symbol}</td>
+          <td>${x.name}</td>
+          <td class="mono">${fmtCap(x.marketCap)}</td>
+          <td class="mono">${x.pe.toFixed(2)}</td>
+          <td class="mono">${x.pb.toFixed(2)}</td>
+          <td class="mono">${Number.isFinite(x.dy) ? `${x.dy.toFixed(2)}%` : "--"}</td>
+          <td class="mono">${(x.score * 100).toFixed(1)}</td>
+        `;
+        els.undervaluedRows.appendChild(tr);
+      }
+    }
+
+    async function refreshMarketData() {
+      try {
+        els.marketUpdatedAt.textContent = "加载中…";
+        const megaQuotes = await fetchQuotes(MEGA7);
+        renderMega7Rows(megaQuotes);
+
+        const charts = await Promise.all(MEGA7.map((s) => fetchChart(s).catch(() => [])));
+        const seriesMap = {};
+        for (let i = 0; i < MEGA7.length; i++) {
+          seriesMap[MEGA7[i]] = normalizeSeries(charts[i]);
+        }
+        drawMega7Canvas(seriesMap);
+
+        const megaCapQuotes = await fetchQuotes(MEGA_CAP_UNIVERSE);
+        renderUndervalued(megaCapQuotes);
+
+        const now = new Date();
+        els.marketUpdatedAt.textContent = `最近刷新：${now.toLocaleString()}`;
+      } catch (err) {
+        els.marketUpdatedAt.textContent = `刷新失败：${String(err.message || err)}`;
+        els.mega7Summary.textContent = "行情接口访问失败，可能是网络或源站限制。";
+      }
+    }
+
+    function monthDiff(fromDate, toDate) {
+      let months = (toDate.getFullYear() - fromDate.getFullYear()) * 12;
+      months += toDate.getMonth() - fromDate.getMonth();
+      return Math.max(months + 1, 1);
+    }
+
+    function yearFraction(fromDate, toDate) {
+      const ms = toDate.getTime() - fromDate.getTime();
+      return Math.max(ms / (365.25 * 24 * 60 * 60 * 1000), 0);
+    }
+
+    function calcRequiredCagr(currentAsset, targetAsset, endDate) {
+      const now = new Date();
+      const years = yearFraction(now, endDate);
+      if (years <= 0) return targetAsset <= currentAsset ? 0 : Infinity;
+      if (currentAsset <= 0) return Infinity;
+      return (Math.pow(targetAsset / currentAsset, 1 / years) - 1) * 100;
+    }
+
+    function calcActualCagr(startCapital, currentAsset, startDate) {
+      if (startCapital <= 0 || currentAsset <= 0) return NaN;
+      const years = yearFraction(startDate, new Date());
+      if (years <= 0) return NaN;
+      return (Math.pow(currentAsset / startCapital, 1 / years) - 1) * 100;
+    }
+
+    function compute() {
+      const profitByAcc = [0, 0, 0, 0];
+      for (const r of state.records) {
+        profitByAcc[0] += Number(r.p1 || 0);
+        profitByAcc[1] += Number(r.p2 || 0);
+        profitByAcc[2] += Number(r.p3 || 0);
+        profitByAcc[3] += Number(r.p4 || 0);
+      }
+
+      const assetsByAcc = state.accounts.map((a, i) => Number(a.startCapital || 0) + profitByAcc[i]);
+      const totalStart = state.accounts.reduce((sum, a) => sum + Number(a.startCapital || 0), 0);
+      const totalProfit = profitByAcc.reduce((s, v) => s + v, 0);
+      const currentAsset = assetsByAcc.reduce((s, v) => s + v, 0);
+      const remaining = Math.max(Number(state.target || 0) - currentAsset, 0);
+      const progress = Math.min((currentAsset / Math.max(Number(state.target || 1), 1)) * 100, 100);
+
+      const targetDate = new Date(`${state.targetDate}T23:59:59`);
+      const today = new Date();
+      const monthsLeft = monthDiff(today, targetDate);
+      const needPerMonth = remaining / monthsLeft;
+
+      const requiredCagrFinal = calcRequiredCagr(currentAsset, Number(state.target || 0), targetDate);
+      const actualCagr = calcActualCagr(totalStart, currentAsset, new Date(`${state.startDate}T00:00:00`));
+
+      return {
+        profitByAcc,
+        assetsByAcc,
+        totalStart,
+        totalProfit,
+        currentAsset,
+        remaining,
+        progress,
+        needPerMonth,
+        monthsLeft,
+        requiredCagrFinal,
+        actualCagr
+      };
+    }
+
+    function syncDynamicLabels() {
+      const n1 = state.accounts[0].name || "账户1";
+      const n2 = state.accounts[1].name || "账户2";
+      const n3 = state.accounts[2].name || "账户3";
+      const n4 = state.accounts[3].name || "账户4";
+      els.profitLabel1.textContent = `${n1} 本月盈利 (CAD)`;
+      els.profitLabel2.textContent = `${n2} 本月盈利 (CAD)`;
+      els.profitLabel3.textContent = `${n3} 本月盈利 (CAD)`;
+      els.profitLabel4.textContent = `${n4} 本月盈利 (CAD)`;
+      els.headAcc1.textContent = n1;
+      els.headAcc2.textContent = n2;
+      els.headAcc3.textContent = n3;
+      els.headAcc4.textContent = n4;
+      els.curveTitle1.textContent = `${n1} 收益曲线`;
+      els.curveTitle2.textContent = `${n2} 收益曲线`;
+      els.curveTitle3.textContent = `${n3} 收益曲线`;
+      els.curveTitle4.textContent = `${n4} 收益曲线`;
+    }
+
+    function getSortedRecords() {
+      return [...state.records]
+        .filter((r) => typeof r.month === "string" && r.month.length > 0)
+        .sort((a, b) => a.month.localeCompare(b.month));
+    }
+
+    function buildCurveSeries(accountIndex) {
+      const records = getSortedRecords();
+      const startNet = Number(state.accounts[accountIndex].startCapital || 0);
+      const values = [startNet];
+      const labels = ["起点"];
+
+      let running = startNet;
+      for (const r of records) {
+        const key = accountIndex === 0 ? "p1" : accountIndex === 1 ? "p2" : accountIndex === 2 ? "p3" : "p4";
+        running += Number(r[key] || 0);
+        values.push(running);
+        labels.push(r.month);
+      }
+      return { values, labels };
+    }
+
+    function renderCurve(svgEl, values, strokeColor) {
+      const width = 320;
+      const height = 150;
+      const padX = 14;
+      const padY = 14;
+
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const spread = Math.max(max - min, 1);
+      const yMin = min - spread * 0.1;
+      const yMax = max + spread * 0.1;
+
+      const xFor = (i) => {
+        if (values.length === 1) return width / 2;
+        return padX + (i / (values.length - 1)) * (width - padX * 2);
+      };
+      const yFor = (v) => padY + ((yMax - v) / (yMax - yMin)) * (height - padY * 2);
+
+      const points = values.map((v, i) => `${xFor(i)},${yFor(v)}`).join(" ");
+      const lastX = xFor(values.length - 1);
+      const lastY = yFor(values[values.length - 1]);
+
+      const midY1 = yFor(yMin + (yMax - yMin) * 0.25);
+      const midY2 = yFor(yMin + (yMax - yMin) * 0.5);
+      const midY3 = yFor(yMin + (yMax - yMin) * 0.75);
+
+      svgEl.innerHTML = `
+        <line x1="${padX}" y1="${midY1}" x2="${width - padX}" y2="${midY1}" stroke="#e5e7eb" stroke-width="1" />
+        <line x1="${padX}" y1="${midY2}" x2="${width - padX}" y2="${midY2}" stroke="#e5e7eb" stroke-width="1" />
+        <line x1="${padX}" y1="${midY3}" x2="${width - padX}" y2="${midY3}" stroke="#e5e7eb" stroke-width="1" />
+        <polyline points="${points}" fill="none" stroke="${strokeColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="${lastX}" cy="${lastY}" r="4.5" fill="${strokeColor}" />
+      `;
+    }
+
+    function renderAccountCurves() {
+      const colors = ["#0f766e", "#0284c7", "#b45309", "#7c3aed"];
+      const metaEls = [els.curveMeta1, els.curveMeta2, els.curveMeta3, els.curveMeta4];
+      const svgEls = [els.curve1, els.curve2, els.curve3, els.curve4];
+
+      for (let i = 0; i < 4; i++) {
+        const { values, labels } = buildCurveSeries(i);
+        const startValue = values[0];
+        const endValue = values[values.length - 1];
+        const delta = endValue - startValue;
+        const pct = startValue !== 0 ? (delta / Math.abs(startValue)) * 100 : NaN;
+
+        renderCurve(svgEls[i], values, colors[i]);
+        metaEls[i].textContent = `最新 ${fmtUSD(endValue)} | 累计变化 ${fmtUSD(delta)} | 变化率 ${Number.isFinite(pct) ? fmtPct(pct) : "--"} | 数据点 ${labels.length - 1} 个月`;
+      }
+    }
+
+    function renderAccountMetrics(result) {
+      els.accountMetrics.innerHTML = "";
+      const total = Math.max(result.currentAsset, 1);
+
+      state.accounts.forEach((acc, i) => {
+        const box = document.createElement("div");
+        box.className = "metric";
+        const share = (result.assetsByAcc[i] / total) * 100;
+        box.innerHTML = `
+          <div class="k">${acc.name} 当前资产</div>
+          <div class="v mono">${fmtUSD(result.assetsByAcc[i])}</div>
+          <div class="k" style="margin-top:6px">累计盈利：${fmtUSD(result.profitByAcc[i])}</div>
+          <div class="k">资产占比：${fmtPct(share)}</div>
+        `;
+        els.accountMetrics.appendChild(box);
+      });
+
+      const totalBox = document.createElement("div");
+      totalBox.className = "metric";
+      const totalProgress = (result.currentAsset / Math.max(Number(state.target || 1), 1)) * 100;
+      totalBox.innerHTML = `
+        <div class="k">总和（4账户）当前资产</div>
+        <div class="v mono">${fmtUSD(result.currentAsset)}</div>
+        <div class="k" style="margin-top:6px">总累计盈利：${fmtUSD(result.totalProfit)}</div>
+        <div class="k">总目标完成率：${fmtPct(Math.min(totalProgress, 100))}</div>
+      `;
+      els.accountMetrics.appendChild(totalBox);
+    }
+
+    function renderRows() {
+      const records = getSortedRecords();
+      els.rows.innerHTML = "";
+
+      if (!records.length) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = '<td colspan="7" style="color:#6b7280">还没有记录，先添加第一条月盈利。</td>';
+        els.rows.appendChild(tr);
+        return;
+      }
+
+      for (const item of records) {
+        const total = Number(item.p1 || 0) + Number(item.p2 || 0) + Number(item.p3 || 0) + Number(item.p4 || 0);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.month}</td>
+          <td class="mono ${Number(item.p1) >= 0 ? "gain" : "loss"}">${fmtUSD(Number(item.p1))}</td>
+          <td class="mono ${Number(item.p2) >= 0 ? "gain" : "loss"}">${fmtUSD(Number(item.p2))}</td>
+          <td class="mono ${Number(item.p3) >= 0 ? "gain" : "loss"}">${fmtUSD(Number(item.p3))}</td>
+          <td class="mono ${Number(item.p4) >= 0 ? "gain" : "loss"}">${fmtUSD(Number(item.p4))}</td>
+          <td class="mono ${total >= 0 ? "gain" : "loss"}">${fmtUSD(total)}</td>
+          <td>
+            <div class="row-actions">
+              <button class="mini" data-month="${item.month}">删除</button>
+            </div>
+          </td>
+        `;
+        els.rows.appendChild(tr);
+      }
+
+      els.rows.querySelectorAll("button[data-month]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const month = btn.getAttribute("data-month");
+          state.records = state.records.filter((r) => r.month !== month);
+          saveState();
+          renderAll();
+        });
+      });
+    }
+
+    function renderGoalRows(currentAsset) {
+      const goalEntries = Object.entries(state.goals)
+        .map(([year, amount]) => ({ year: Number(year), amount: Number(amount) }))
+        .filter((x) => Number.isFinite(x.year) && Number.isFinite(x.amount) && x.amount >= 0)
+        .sort((a, b) => a.year - b.year);
+
+      els.goalRows.innerHTML = "";
+
+      if (!goalEntries.length) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = '<td colspan="6" style="color:#6b7280">还没有年度目标，先添加一条。</td>';
+        els.goalRows.appendChild(tr);
+        return;
+      }
+
+      for (const goal of goalEntries) {
+        const endDate = new Date(`${goal.year}-12-31T23:59:59`);
+        const remain = Math.max(goal.amount - currentAsset, 0);
+        const pct = Math.min((currentAsset / Math.max(goal.amount, 1)) * 100, 100);
+        const req = calcRequiredCagr(currentAsset, goal.amount, endDate);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${goal.year}</td>
+          <td class="mono">${fmtUSD(goal.amount)}</td>
+          <td class="mono ${remain > 0 ? "loss" : "gain"}">${fmtUSD(remain)}</td>
+          <td class="mono">${fmtPct(pct)}</td>
+          <td class="mono">${Number.isFinite(req) ? fmtPct(req) : "--"}</td>
+          <td>
+            <div class="row-actions">
+              <button class="mini" data-del-year="${goal.year}">删除</button>
+            </div>
+          </td>
+        `;
+        els.goalRows.appendChild(tr);
+      }
+
+      els.goalRows.querySelectorAll("button[data-del-year]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const y = btn.getAttribute("data-del-year");
+          delete state.goals[y];
+          saveState();
+          renderAll();
+        });
+      });
+    }
+
+    function renderAll() {
+      els.target.value = state.target;
+      els.startDate.value = state.startDate;
+      els.targetDate.value = state.targetDate;
+      els.accName1.value = state.accounts[0].name;
+      els.accName2.value = state.accounts[1].name;
+      els.accName3.value = state.accounts[2].name;
+      els.accName4.value = state.accounts[3].name;
+      els.accStart1.value = state.accounts[0].startCapital;
+      els.accStart2.value = state.accounts[1].startCapital;
+      els.accStart3.value = state.accounts[2].startCapital;
+      els.accStart4.value = state.accounts[3].startCapital;
+
+      syncDynamicLabels();
+      const result = compute();
+
+      els.currentAsset.textContent = fmtUSD(result.currentAsset);
+      els.remaining.textContent = fmtUSD(result.remaining);
+      els.totalProfit.textContent = fmtUSD(result.totalProfit);
+      els.needPerMonth.textContent = fmtUSD(result.needPerMonth);
+      els.actualCagr.textContent = Number.isFinite(result.actualCagr) ? fmtPct(result.actualCagr) : "--";
+      els.requiredCagrFinal.textContent = Number.isFinite(result.requiredCagrFinal) ? fmtPct(result.requiredCagrFinal) : "--";
+      els.progressBar.style.width = `${result.progress.toFixed(2)}%`;
+      els.progressText.textContent = `最终目标进度 ${result.progress.toFixed(2)}%`;
+
+      if (result.remaining <= 0) {
+        els.warningBox.style.display = "block";
+        els.warningBox.textContent = "你已经达到或超过最终目标，接下来可以上调目标。";
+      } else {
+        const warnThreshold = 20000;
+        els.warningBox.style.display = "block";
+        els.warningBox.textContent = result.needPerMonth > warnThreshold
+          ? `按当前进度推算，接下来平均每月需盈利 ${fmtUSD(result.needPerMonth)}（剩余 ${result.monthsLeft} 个月）。`
+          : `节奏正常：剩余 ${result.monthsLeft} 个月，月均需盈利 ${fmtUSD(result.needPerMonth)}。`;
+      }
+
+      renderAccountMetrics(result);
+      renderAccountCurves();
+      renderGoalRows(result.currentAsset);
+      renderRows();
+    }
+
+    function upsertRecord(month, p1, p2, p3, p4) {
+      const idx = state.records.findIndex((r) => r.month === month);
+      const payload = { month, p1, p2, p3, p4 };
+      if (idx >= 0) {
+        state.records[idx] = payload;
+      } else {
+        state.records.push(payload);
+      }
+      saveState();
+      renderAll();
+    }
+
+    function syncAccountStateFromInputs() {
+      state.accounts[0].name = (els.accName1.value || "账户1").trim() || "账户1";
+      state.accounts[1].name = (els.accName2.value || "账户2").trim() || "账户2";
+      state.accounts[2].name = (els.accName3.value || "账户3").trim() || "账户3";
+      state.accounts[3].name = (els.accName4.value || "账户4").trim() || "账户4";
+      state.accounts[0].startCapital = Number(els.accStart1.value) || 0;
+      state.accounts[1].startCapital = Number(els.accStart2.value) || 0;
+      state.accounts[2].startCapital = Number(els.accStart3.value) || 0;
+      state.accounts[3].startCapital = Number(els.accStart4.value) || 0;
+    }
+
+    els.addBtn.addEventListener("click", () => {
+      const month = els.month.value;
+      const p1 = Number(els.profit1.value || 0);
+      const p2 = Number(els.profit2.value || 0);
+      const p3 = Number(els.profit3.value || 0);
+      const p4 = Number(els.profit4.value || 0);
+
+      if (!month) {
+        alert("请选择月份");
+        return;
+      }
+      if ([p1, p2, p3, p4].some((x) => Number.isNaN(x))) {
+        alert("请检查四个账户的盈利输入");
+        return;
+      }
+
+      upsertRecord(month, p1, p2, p3, p4);
+      els.profit1.value = "";
+      els.profit2.value = "";
+      els.profit3.value = "";
+      els.profit4.value = "";
+    });
+
+    els.addGoalBtn.addEventListener("click", () => {
+      const year = Number(els.goalYear.value);
+      const amount = Number(els.goalAmount.value);
+
+      if (!Number.isInteger(year) || year < 2020 || year > 2100) {
+        alert("请输入有效年份（2020-2100）");
+        return;
+      }
+      if (Number.isNaN(amount) || amount < 0) {
+        alert("请输入有效目标资产");
+        return;
+      }
+
+      state.goals[String(year)] = amount;
+      saveState();
+      renderAll();
+      els.goalAmount.value = "";
+    });
+
+    [
+      "target",
+      "startDate",
+      "targetDate",
+      "accName1",
+      "accName2",
+      "accName3",
+      "accName4",
+      "accStart1",
+      "accStart2",
+      "accStart3",
+      "accStart4"
+    ].forEach((key) => {
+      els[key].addEventListener("change", () => {
+        state.target = Number(els.target.value) || 0;
+        state.startDate = els.startDate.value || todayISO;
+        state.targetDate = els.targetDate.value || "2030-12-31";
+        syncAccountStateFromInputs();
+        saveState();
+        renderAll();
+      });
+    });
+
+    ["accName1", "accName2", "accName3", "accName4"].forEach((key) => {
+      els[key].addEventListener("input", () => {
+        syncAccountStateFromInputs();
+        saveState();
+        syncDynamicLabels();
+      });
+    });
+
+    els.refreshMarketBtn.addEventListener("click", () => {
+      refreshMarketData();
+    });
+
+    renderAll();
+    refreshMarketData();
+  </script>
+</body>
+</html>
